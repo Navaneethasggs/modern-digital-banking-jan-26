@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import AdminLogin from "./pages/AdminLogin";
 
+import Dashboard from "./pages/Dashboard";
+import Accounts from "./pages/Accounts";
+import Transactions from "./pages/Transactions";
+import Budgets from "./pages/Budgets";
+import Bills from "./pages/Bills";
+import Rewards from "./pages/Rewards";
+import Insights from "./pages/Insights";
+import Alerts from "./pages/Alerts";
+
+import PageContainer from "./layout/PageContainer";
+
+const withLayout = (Component) => (
+  <PageContainer>
+    <Component />
+  </PageContainer>
+);
+
+export default function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <BrowserRouter>
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
 
-export default App
+        {/* Dashboard */}
+        <Route path="/dashboard" element={withLayout(Dashboard)} />
+        <Route path="/accounts" element={withLayout(Accounts)} />
+        <Route path="/transactions" element={withLayout(Transactions)} />
+        <Route path="/budgets" element={withLayout(Budgets)} />
+        <Route path="/bills" element={withLayout(Bills)} />
+        <Route path="/rewards" element={withLayout(Rewards)} />
+        <Route path="/insights" element={withLayout(Insights)} />
+        <Route path="/alerts" element={withLayout(Alerts)} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
