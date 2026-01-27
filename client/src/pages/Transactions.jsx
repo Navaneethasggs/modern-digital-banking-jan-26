@@ -1,3 +1,6 @@
-export default function Accounts() {
-  return <h1 className="text-xl">Transactions Page</h1>;
+import { useTransactions } from "../features/transactions";
+
+export default function Transactions() {
+  const { transactions } = useTransactions();
+  return <p>Total transactions: {transactions.length}</p>;
 }
