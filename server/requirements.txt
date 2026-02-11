@@ -1,8 +1,9 @@
 fastapi
-uvicorn
+uvicorn[standard]
 python-dotenv
-sqlalchemy
+sqlmodel
 psycopg2-binary
-pydantic
-python-jose
+pydantic[email]
+pydantic-settings
+python-jose[cryptography]
 passlib[bcrypt]
