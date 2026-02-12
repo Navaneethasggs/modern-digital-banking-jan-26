@@ -34,3 +34,21 @@ client/.env.local
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs & Diagnostics
+*.log
+*_log.txt
+server_final_log.txt
+client_final_log.txt
+vite_log.txt
+uvicorn_log.txt
+conn_log.txt
+check_out.txt
+users_list.txt
+
+# Temp & Local
+.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pip-log.txt
