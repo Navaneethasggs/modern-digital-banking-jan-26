@@ -1,11 +1,5 @@
 from fastapi import FastAPI
-<<<<<<< Updated upstream
-from src.api import api_router
-
-app = FastAPI(title="NeoVault API")
-
-app.include_router(api_router)
-=======
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.auth.router import router as auth_router
@@ -35,4 +29,3 @@ app.include_router(transactions_router, prefix="/transactions", tags=["Transacti
 app.include_router(budgets_router, prefix="/budgets", tags=["Budgets"])
 app.include_router(bills_router, prefix="/bills", tags=["Bills & Rewards"])
 app.include_router(analytics_router, prefix="/analytics", tags=["Analytics & Alerts"])
->>>>>>> Stashed changes

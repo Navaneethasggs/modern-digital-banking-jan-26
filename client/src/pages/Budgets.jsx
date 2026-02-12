@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-export default function Accounts() {
-  return <h1 className="text-xl">Budgets Page</h1>;
-=======
 import React, { useState } from 'react';
 import { useGlobal } from '../context/GlobalState';
 import api from '../api/axios';
@@ -187,5 +183,4 @@ export default function Budgets() {
       )}
     </div>
   );
->>>>>>> Stashed changes
 }
