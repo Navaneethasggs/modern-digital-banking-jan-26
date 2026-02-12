@@ -13,12 +13,26 @@ import Rewards from "./pages/Rewards";
 import Insights from "./pages/Insights";
 import Alerts from "./pages/Alerts";
 
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserManagement from "./pages/admin/UserManagement";
+import KYCVerification from "./pages/admin/KYCVerification";
+import SystemAlerts from "./pages/admin/SystemAlerts";
+import AdminLogs from "./pages/admin/AdminLogs";
+import Reports from "./pages/admin/Reports";
+
 import PageContainer from "./layout/PageContainer";
+import AdminPageContainer from "./layout/AdminPageContainer";
 
 const withLayout = (Component) => (
   <PageContainer>
     <Component />
   </PageContainer>
+);
+
+const withAdminLayout = (Component) => (
+  <AdminPageContainer>
+    <Component />
+  </AdminPageContainer>
 );
 
 export default function App() {
@@ -39,6 +53,14 @@ export default function App() {
         <Route path="/rewards" element={withLayout(Rewards)} />
         <Route path="/insights" element={withLayout(Insights)} />
         <Route path="/alerts" element={withLayout(Alerts)} />
+
+        {/* Admin */}
+        <Route path="/admin/dashboard" element={withAdminLayout(AdminDashboard)} />
+        <Route path="/admin/users" element={withAdminLayout(UserManagement)} />
+        <Route path="/admin/kyc" element={withAdminLayout(KYCVerification)} />
+        <Route path="/admin/alerts" element={withAdminLayout(SystemAlerts)} />
+        <Route path="/admin/logs" element={withAdminLayout(AdminLogs)} />
+        <Route path="/admin/reports" element={withAdminLayout(Reports)} />
       </Routes>
     </BrowserRouter>
   );

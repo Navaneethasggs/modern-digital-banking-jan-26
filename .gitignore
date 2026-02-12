@@ -1,6 +1,36 @@
+# Root .gitignore for NeoVault
+
+# Node.js
 node_modules/
+dist/
+build/
+*.local
+
+# Python
 venv/
-.env
+.venv/
 __pycache__/
-*.log
+*.py[cod]
+*$py.class
+server/src/__pycache__/
+.pytest_cache/
+
+# Databases
+server/*.db
+server/*.db-journal
+server/*.db-shm
+server/*.db-wal
+
+# Environment
+.env
+.env.local
+server/.env
+client/.env.local
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
 .DS_Store
+Thumbs.db
