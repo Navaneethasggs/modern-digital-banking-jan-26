@@ -1,24 +1,18 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import AdminLogin from "./pages/AdminLogin";
+import { Login, Signup } from "./features/auth";
 
-import Dashboard from "./pages/Dashboard";
-import Accounts from "./pages/Accounts";
-import Transactions from "./pages/Transactions";
-import Budgets from "./pages/Budgets";
-import Bills from "./pages/Bills";
-import Rewards from "./pages/Rewards";
-import Insights from "./pages/Insights";
-import Alerts from "./pages/Alerts";
 
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import UserManagement from "./pages/admin/UserManagement";
-import KYCVerification from "./pages/admin/KYCVerification";
-import SystemAlerts from "./pages/admin/SystemAlerts";
-import AdminLogs from "./pages/admin/AdminLogs";
-import Reports from "./pages/admin/Reports";
+import { Dashboard } from "./features/dashboard";
+import { Accounts } from "./features/accounts";
+import { Transactions } from "./features/transactions";
+import { Budgets } from "./features/budgets";
+import { Bills } from "./features/bills";
+import { Rewards } from "./features/rewards";
+import { Insights } from "./features/insights";
+import { Alerts } from "./features/alerts";
+
+import { Login as AdminLogin, AdminDashboard, UserManagement, KYCVerification, SystemAlerts, AdminLogs, Reports } from "./features/admin";
 
 import PageContainer from "./layout/PageContainer";
 import AdminPageContainer from "./layout/AdminPageContainer";

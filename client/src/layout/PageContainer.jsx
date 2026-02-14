@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from '../components/Sidebar';
 import { useAuth } from '../context/AuthContext';
-import { useGlobal } from '../context/GlobalState';
+import { useTransactions } from '../features/transactions';
+import { useAccounts } from '../features/accounts';
 import { Bell, Search, User, ChevronDown, X, ArrowUpRight, ArrowDownRight, Wallet } from 'lucide-react';
 import { cn, formatCurrency } from '../lib/utils';
 import { useNavigate, Link } from 'react-router-dom';
@@ -10,7 +11,8 @@ import { ThemeToggle } from '../components/ThemeToggle';
 export default function PageContainer({ children }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { transactions, accounts } = useGlobal();
+  const { transactions } = useTransactions();
+  const { accounts } = useAccounts();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState({ transactions: [], accounts: [] });
   const [showResults, setShowResults] = useState(false);
