@@ -1,8 +1,8 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/neovault"
-    # DATABASE_URL: str = "sqlite+aiosqlite:///./neovault.db"
+    # DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/neovault"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./neovault.db"
     
     SECRET_KEY: str = "your-secret-key-here"
     ALGORITHM: str = "HS256"
