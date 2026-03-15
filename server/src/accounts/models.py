@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Enum, Numeric, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Enum, DateTime, ForeignKey, Float, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database import Base
@@ -18,9 +18,10 @@ class Account(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     bank_name = Column(String, nullable=False)
     account_type = Column(Enum(AccountType), nullable=False)
-    masked_account = Column(String, nullable=False)
-    currency = Column(String(3), default="USD")
-    balance = Column(Numeric(10, 2), default=0.0)
+    masked_account = Column(String(50), nullable=False)
+    balance = Column(Float, default=0.0)
+    currency = Column(String(3), default="INR")
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     owner = relationship("src.auth.models.User")

@@ -38,7 +38,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 ### Demo Credentials
 | Role | Email | Password |
 | :--- | :--- | :--- |
-| **User** | `aditya@example.com` | `password123` |
+| **User** | `test@test.com` | `test@1234` |
 | **Admin** | `admin@neovault.com` | `admin123` |
 
 > [!NOTE]

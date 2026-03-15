@@ -7,8 +7,9 @@ class AccountBase(BaseModel):
     bank_name: str
     account_type: AccountType
     masked_account: str
-    currency: str = "USD"
-    balance: float
+    balance: float = 0.0
+    currency: str = "INR"
+    is_active: bool = True
 
 class AccountCreate(AccountBase):
     pass

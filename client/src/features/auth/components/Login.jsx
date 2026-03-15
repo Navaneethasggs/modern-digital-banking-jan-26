@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Wallet, ShieldCheck, Mail, Lock, Apple, Zap, Activity } from 'lucide-react';
 
 export default function Login() {
-  const [email, setEmail] = useState('aditya@example.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('test@test.com');
+  const [password, setPassword] = useState('test@1234');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();

@@ -95,7 +95,7 @@ docker-compose up -d
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
-| **User** | `aditya@example.com` | `password123` |
+| **User** | `test@test.com` | `test@1234` |
 | **Admin** | `admin@neovault.com` | `admin123` |
 
 ## 📍 Local URLs

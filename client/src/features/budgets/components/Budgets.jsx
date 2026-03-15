@@ -6,11 +6,13 @@ import { Button } from '../../../components/ui/button';
 import { Progress } from '../../../components/ui/progress';
 import { Badge } from '../../../components/ui/badge';
 import { formatCurrency, cn } from '../../../lib/utils';
-import { Plus, Target, AlertCircle, CheckCircle2, MoreVertical, TrendingUp } from 'lucide-react';
+import { Plus, Target, AlertCircle, CheckCircle2, MoreVertical, TrendingUp, Edit } from 'lucide-react';
 
 export default function Budgets() {
   const { budgets, refreshBudgets } = useBudgets();
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
   const [formData, setFormData] = useState({
     category: '',
     limit_amount: '',
@@ -21,14 +23,32 @@ export default function Budgets() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/budgets/', formData);
+      if (editingId) {
+        await api.put(`/budgets/${editingId}`, formData);
+      } else {
+        await api.post('/budgets/', formData);
+      }
       setShowModal(false);
+      setEditingId(null);
       setFormData({ category: '', limit_amount: '', month: new Date().getMonth() + 1, year: new Date().getFullYear() });
       refreshBudgets();
     } catch (error) {
-      console.error("Failed to create budget", error);
+      console.error("Failed to save budget", error);
     }
   };
+
+  const handleEditClick = (budget) => {
+    setFormData({
+      category: budget.category,
+      limit_amount: budget.limit_amount,
+      month: budget.month,
+      year: budget.year
+    });
+    setEditingId(budget.id);
+    setShowModal(true);
+    setDropdownOpen(null);
+  };
+
 
   const currentMonth = new Date().toLocaleString('default', { month: 'long' });
 
@@ -73,9 +93,24 @@ export default function Budgets() {
                       <CardDescription>Target for {currentMonth}</CardDescription>
                     </div>
                   </div>
-                  <button className="text-muted-foreground hover:text-foreground">
-                    <MoreVertical className="h-4 w-4" />
-                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => setDropdownOpen(dropdownOpen === budget.id ? null : budget.id)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </button>
+                    {dropdownOpen === budget.id && (
+                      <div className="absolute right-0 top-full mt-1 w-32 rounded-md shadow-lg bg-background border border-border/50 z-10 flex flex-col py-1">
+                        <button
+                          onClick={() => handleEditClick(budget)}
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-muted/50 flex items-center gap-2"
+                        >
+                          <Edit className="h-3.5 w-3.5" /> Edit
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
 
@@ -132,11 +167,11 @@ export default function Budgets() {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => { setShowModal(false); setEditingId(null); }} />
           <Card className="w-full max-w-sm relative z-10 shadow-2xl animate-in zoom-in-95 duration-200">
             <CardHeader>
-              <CardTitle>Set Category Budget</CardTitle>
-              <CardDescription>Define a monthly spending limit for a category</CardDescription>
+              <CardTitle>{editingId ? "Edit Category Budget" : "Set Category Budget"}</CardTitle>
+              <CardDescription>{editingId ? "Modify your spending limit" : "Define a monthly spending limit for a category"}</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-4">
@@ -174,8 +209,8 @@ export default function Budgets() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end gap-3">
-                <Button variant="ghost" type="button" onClick={() => setShowModal(false)}>Cancel</Button>
-                <Button type="submit">Set Budget</Button>
+                <Button variant="ghost" type="button" onClick={() => { setShowModal(false); setEditingId(null); }}>Cancel</Button>
+                <Button type="submit">{editingId ? "Save Changes" : "Set Budget"}</Button>
               </CardFooter>
             </form>
           </Card>

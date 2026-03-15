@@ -33,14 +33,14 @@ async def create_users():
             print("Admin user already exists.")
 
         # Create Regular User
-        result = await session.execute(select(User).where(User.email == "aditya@example.com"))
+        result = await session.execute(select(User).where(User.email == "test@test.com"))
         user = result.scalars().first()
         if not user:
             print("Creating regular user...")
-            hashed_pw = get_password_hash("password123")
+            hashed_pw = get_password_hash("test@1234")
             new_user = User(
-                name="Aditya",
-                email="aditya@example.com",
+                name="Test User",
+                email="test@test.com",
                 hashed_password=hashed_pw,
                 phone="0987654321",
                 kyc_status=KYCStatus.verified

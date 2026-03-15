@@ -10,6 +10,7 @@ import { Budgets } from "./features/budgets";
 import { Bills } from "./features/bills";
 import { Rewards } from "./features/rewards";
 import { Insights } from "./features/insights";
+import { CurrencyConverter } from "./features/currency-converter";
 import { Alerts } from "./features/alerts";
 
 import { Login as AdminLogin, AdminDashboard, UserManagement, KYCVerification, SystemAlerts, AdminLogs, Reports } from "./features/admin";
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="/bills" element={withLayout(Bills)} />
         <Route path="/rewards" element={withLayout(Rewards)} />
         <Route path="/insights" element={withLayout(Insights)} />
+        <Route path="/currency-converter" element={withLayout(CurrencyConverter)} />
         <Route path="/alerts" element={withLayout(Alerts)} />
 
         {/* Admin */}

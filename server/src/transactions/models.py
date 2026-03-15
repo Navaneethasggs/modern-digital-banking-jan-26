@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Enum, Numeric, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database import Base
@@ -13,10 +13,10 @@ class Transaction(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     account_id = Column(Integer, ForeignKey("accounts.id"))
-    description = Column(String, nullable=False)
-    category = Column(String, nullable=True)
-    amount = Column(Numeric(10, 2), nullable=False)
-    currency = Column(String(3), default="USD")
+    description = Column(String(255), nullable=False)
+    category = Column(String(100))
+    amount = Column(Float, nullable=False)
+    currency = Column(String(3), default="INR")
     txn_type = Column(Enum(TransactionType), nullable=False)
     merchant = Column(String, nullable=True)
     txn_date = Column(DateTime(timezone=True), default=func.now())

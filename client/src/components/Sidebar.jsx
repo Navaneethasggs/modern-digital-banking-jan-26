@@ -11,7 +11,8 @@ import {
     Gift,
     BarChart3,
     LogOut,
-    Wallet
+    Wallet,
+    RefreshCw
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -23,6 +24,7 @@ const navigation = [
     { name: 'Bills', href: '/bills', icon: FileText },
     { name: 'Rewards', href: '/rewards', icon: Gift },
     { name: 'Insights', href: '/insights', icon: BarChart3 },
+    { name: 'Currency Converter', href: '/currency-converter', icon: RefreshCw },
     { name: 'Alerts', href: '/alerts', icon: Bell },
 ];
 

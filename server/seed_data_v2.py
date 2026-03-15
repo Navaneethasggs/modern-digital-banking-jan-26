@@ -20,21 +20,21 @@ async def seed_data():
     # Use expire_on_commit=False to prevent "MissingGreenlet" on attribute access after commit
     async with SessionLocal() as session:
         # Get the regular user
-        result = await session.execute(select(User).where(User.email == "aditya@example.com"))
+        result = await session.execute(select(User).where(User.email == "test@test.com"))
         user = result.scalars().first()
         
         if not user:
-            print("User 'aditya@example.com' not found. Please run create_admin.py first.")
+            print("User 'test@test.com' not found. Please run create_admin.py first.")
             return
 
         print(f"Seeding data for user: {user.name} ({user.id})")
 
         # 1. Seed Accounts
         accounts_data = [
-            {"bank_name": "Chase Bank", "account_type": AccountType.checking, "masked_account": "**** 1234", "balance": 5432.10},
-            {"bank_name": "Bank of America", "account_type": AccountType.savings, "masked_account": "**** 5678", "balance": 12500.50},
-            {"bank_name": "Amex Platinum", "account_type": AccountType.credit_card, "masked_account": "**** 9012", "balance": -450.00},
-            {"bank_name": "Robinhood", "account_type": AccountType.investment, "masked_account": "**** 3456", "balance": 8900.00},
+            {"bank_name": "HDFC Bank", "account_type": AccountType.checking, "masked_account": "**** 1234", "balance": 54320.10},
+            {"bank_name": "SBI Savings", "account_type": AccountType.savings, "masked_account": "**** 5678", "balance": 125000.50},
+            {"bank_name": "ICICI Platinum", "account_type": AccountType.credit_card, "masked_account": "**** 9012", "balance": -4500.00},
+            {"bank_name": "Zerodha", "account_type": AccountType.investment, "masked_account": "**** 3456", "balance": 89000.00},
         ]
 
         created_accounts = []
@@ -49,7 +49,7 @@ async def seed_data():
                     account_type=acc["account_type"],
                     masked_account=acc["masked_account"],
                     balance=acc["balance"],
-                    currency="USD"
+                    currency="INR"
                 )
                 session.add(new_acc)
                 created_accounts.append(new_acc)
@@ -62,7 +62,7 @@ async def seed_data():
 
         # 2. Seed Transactions
         categories = ["Food & Dining", "Transportation", "Shopping", "Entertainment", "Bills & Utilities", "Health", "Salary", "Transfer"]
-        merchants = ["Uber", "Starbucks", "Amazon", "Netflix", "Whole Foods", "Target", "Shell Station", "Apple Store"]
+        merchants = ["Swiggy", "Zomato", "Amazon India", "Flipkart", "Reliance Smart", "Jio", "Indian Oil", "Croma"]
         
         transactions_to_add = []
         for acc in created_accounts:
@@ -79,7 +79,7 @@ async def seed_data():
                     description=desc,
                     category=cat,
                     amount=amount,
-                    currency="USD",
+                    currency="INR",
                     txn_type=type_,
                     merchant=random.choice(merchants) if type_ == TransactionType.debit else "Employer",
                     txn_date=datetime.now() - timedelta(days=random.randint(0, 60)),
@@ -92,10 +92,10 @@ async def seed_data():
 
         # 3. Seed Budgets
         budgets_data = [
-            {"category": "Food & Dining", "limit": 600.00, "spent": 450.00},
-            {"category": "Transportation", "limit": 300.00, "spent": 120.00},
-            {"category": "Entertainment", "limit": 200.00, "spent": 180.00},
-            {"category": "Shopping", "limit": 400.00, "spent": 350.00},
+            {"category": "Food & Dining", "limit": 15000.00, "spent": 12450.00},
+            {"category": "Transportation", "limit": 5000.00, "spent": 2120.00},
+            {"category": "Entertainment", "limit": 4000.00, "spent": 3180.00},
+            {"category": "Shopping", "limit": 10000.00, "spent": 8350.00},
         ]
         
         current_month = datetime.now().month
@@ -120,10 +120,10 @@ async def seed_data():
 
         # 4. Seed Bills
         bills_data = [
-            {"biller": "Electric Utility", "amount": 120.50, "date": date.today() + timedelta(days=5), "status": BillStatus.upcoming},
-            {"biller": "Internet Provider", "amount": 80.00, "date": date.today() + timedelta(days=10), "status": BillStatus.upcoming},
-            {"biller": "Rent", "amount": 1500.00, "date": date.today() - timedelta(days=2), "status": BillStatus.paid},
-            {"biller": "Credit Card Payment", "amount": 200.00, "date": date.today() - timedelta(days=5), "status": BillStatus.overdue},
+            {"biller": "BSES Rajdhani", "amount": 2120.50, "date": date.today() + timedelta(days=5), "status": BillStatus.upcoming},
+            {"biller": "Jio Fiber", "amount": 999.00, "date": date.today() + timedelta(days=10), "status": BillStatus.upcoming},
+            {"biller": "House Rent", "amount": 25000.00, "date": date.today() - timedelta(days=2), "status": BillStatus.paid},
+            {"biller": "HDFC Credit Card", "amount": 5200.00, "date": date.today() - timedelta(days=5), "status": BillStatus.overdue},
         ]
 
         for bill in bills_data:

@@ -1,8 +1,8 @@
-"""Initial migration
+"""Init
 
-Revision ID: 8da2c79e9de4
+Revision ID: a7c712025dea
 Revises: 
-Create Date: 2026-02-12 15:44:35.326087
+Create Date: 2026-03-11 09:28:21.748827
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8da2c79e9de4'
+revision = 'a7c712025dea'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,9 +35,10 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('bank_name', sa.String(), nullable=False),
     sa.Column('account_type', sa.Enum('savings', 'checking', 'credit_card', 'loan', 'investment', name='accounttype'), nullable=False),
-    sa.Column('masked_account', sa.String(), nullable=False),
+    sa.Column('masked_account', sa.String(length=50), nullable=False),
+    sa.Column('balance', sa.Float(), nullable=True),
     sa.Column('currency', sa.String(length=3), nullable=True),
-    sa.Column('balance', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -59,6 +60,7 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('type', sa.Enum('low_balance', 'bill_due', 'budget_exceeded', name='alerttype'), nullable=False),
     sa.Column('message', sa.Text(), nullable=False),
+    sa.Column('is_read', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -103,9 +105,9 @@ def upgrade() -> None:
     op.create_table('transactions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('account_id', sa.Integer(), nullable=True),
-    sa.Column('description', sa.String(), nullable=False),
-    sa.Column('category', sa.String(), nullable=True),
-    sa.Column('amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('description', sa.String(length=255), nullable=False),
+    sa.Column('category', sa.String(length=100), nullable=True),
+    sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('currency', sa.String(length=3), nullable=True),
     sa.Column('txn_type', sa.Enum('debit', 'credit', name='transactiontype'), nullable=False),
     sa.Column('merchant', sa.String(), nullable=True),

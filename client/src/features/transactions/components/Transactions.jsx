@@ -6,12 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { formatCurrency, formatDate, cn } from '../../../lib/utils';
-import { Plus, ArrowUpRight, ArrowDownRight, Filter, Download, Search, MoreHorizontal } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownRight, Filter, Download, Search, MoreHorizontal, Edit, Trash } from 'lucide-react';
+import { useBudgets } from '../../budgets/context/BudgetsContext';
 
 export default function Transactions() {
   const { transactions, refreshTransactions } = useTransactions();
   const { accounts } = useAccounts();
+  const { budgets } = useBudgets();
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -27,13 +31,44 @@ export default function Transactions() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/transactions/', formData);
+      if (editingId) {
+        await api.put(`/transactions/${editingId}`, formData);
+      } else {
+        await api.post('/transactions/', formData);
+      }
       setShowModal(false);
+      setEditingId(null);
       setFormData({ account_id: '', description: '', category: '', amount: '', txn_type: 'debit', merchant: '' });
       refreshTransactions();
     } catch (error) {
-      console.error("Failed to create transaction", error);
+      console.error("Failed to save transaction", error);
     }
+  };
+
+  const handleDelete = async (txnId) => {
+    if (window.confirm("Are you sure you want to delete this transaction? This action cannot be undone and will update your account balance.")) {
+      try {
+        await api.delete(`/transactions/${txnId}`);
+        refreshTransactions();
+      } catch (error) {
+        console.error("Failed to delete transaction", error);
+      }
+    }
+    setDropdownOpen(null);
+  };
+
+  const handleEditClick = (txn) => {
+    setFormData({
+      account_id: txn.account_id,
+      description: txn.description,
+      category: txn.category || '',
+      amount: txn.amount,
+      txn_type: txn.txn_type,
+      merchant: txn.merchant || ''
+    });
+    setEditingId(txn.id);
+    setShowModal(true);
+    setDropdownOpen(null);
   };
 
   const filteredTransactions = transactions.filter(txn => {
@@ -153,11 +188,34 @@ export default function Transactions() {
                     )}>
                       {txn.txn_type === 'credit' ? '+' : '-'} {formatCurrency(txn.amount, txn.currency)}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                    <td className="px-6 py-4 text-right relative">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setDropdownOpen(dropdownOpen === txn.id ? null : txn.id)}
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                      >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
+
+                      {dropdownOpen === txn.id && (
+                        <div className="absolute right-10 top-1/2 -translate-y-1/2 mt-1 w-32 rounded-md shadow-lg bg-background border border-border/50 z-10 flex flex-col py-1">
+                          <button
+                            onClick={() => handleEditClick(txn)}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-muted/50 flex items-center gap-2"
+                          >
+                            <Edit className="h-3.5 w-3.5" /> Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(txn.id)}
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-destructive/10 text-destructive flex items-center gap-2"
+                          >
+                            <Trash className="h-3.5 w-3.5" /> Delete
+                          </button>
+                        </div>
+                      )}
                     </td>
+
                   </tr>
                 ))}
               </tbody>
@@ -177,11 +235,11 @@ export default function Transactions() {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => { setShowModal(false); setEditingId(null); }} />
           <Card className="w-full max-w-md relative z-10 shadow-2xl animate-in zoom-in-95 duration-200">
             <CardHeader>
-              <CardTitle>Add Transaction</CardTitle>
-              <CardDescription>Record a new manual transaction</CardDescription>
+              <CardTitle>{editingId ? "Edit Transaction" : "Add Transaction"}</CardTitle>
+              <CardDescription>{editingId ? "Modify an existing transaction" : "Record a new manual transaction"}</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-4">
@@ -237,13 +295,21 @@ export default function Transactions() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Category</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Food"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all"
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        list="budget-categories"
+                        placeholder="e.g. Food"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      />
+                      <datalist id="budget-categories">
+                        {budgets.map((b) => (
+                          <option key={b.id} value={b.category} />
+                        ))}
+                      </datalist>
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -258,8 +324,8 @@ export default function Transactions() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end gap-3">
-                <Button variant="ghost" type="button" onClick={() => setShowModal(false)}>Cancel</Button>
-                <Button type="submit">Add Transaction</Button>
+                <Button variant="ghost" type="button" onClick={() => { setShowModal(false); setEditingId(null); }}>Cancel</Button>
+                <Button type="submit">{editingId ? "Save Changes" : "Add Transaction"}</Button>
               </CardFooter>
             </form>
           </Card>

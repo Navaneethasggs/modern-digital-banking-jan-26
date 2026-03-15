@@ -1,8 +1,8 @@
 export const mockUsers = [
     {
         id: "usr_1",
-        name: "Aditya Sharma",
-        email: "aditya@example.com",
+        name: "Test User",
+        email: "test@test.com",
         phone: "+91 98765 43210",
         kyc_status: "verified",
         created_at: "2024-01-10T08:30:00Z",
