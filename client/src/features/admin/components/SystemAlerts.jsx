@@ -5,7 +5,7 @@ import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import { mockAlerts } from '../../../lib/mock-admin-data';
 import { formatDateTime, cn } from '../../../lib/utils';
-import { AlertCircle, CheckCircle, Info, AlertTriangle, Bell, Trash2 } from 'lucide-react';
+import { AlertCircle, CheckCircle, Info, AlertTriangle, Bell, Trash2, Wallet } from 'lucide-react';
 
 export default function SystemAlerts() {
     const getAlertIcon = (type) => {
@@ -13,6 +13,7 @@ export default function SystemAlerts() {
             case 'error':
                 return <AlertCircle className="h-5 w-5 text-destructive" />;
             case 'warning':
+            case 'budget_crossing': // New Icon case
                 return <AlertTriangle className="h-5 w-5 text-warning" />;
             case 'success':
                 return <CheckCircle className="h-5 w-5 text-success" />;
@@ -27,6 +28,8 @@ export default function SystemAlerts() {
         switch (type) {
             case 'error':
                 return <Badge className="bg-destructive text-white border-none text-[10px] font-bold uppercase tracking-widest">Critical</Badge>;
+            case 'budget_crossing': // New Badge case for mentor requirement
+                return <Badge className="bg-orange-500 text-white border-none text-[10px] font-bold uppercase tracking-widest">Budget Overlimit</Badge>;
             case 'warning':
                 return <Badge className="bg-warning text-warning-foreground border-none text-[10px] font-bold uppercase tracking-widest">Warning</Badge>;
             case 'success':
@@ -42,7 +45,7 @@ export default function SystemAlerts() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight mb-1">System Alerts</h1>
-                <p className="text-muted-foreground">Monitor system-wide security alerts and notifications</p>
+                <p className="text-muted-foreground">Monitor system-wide security alerts and budget crossing notifications</p>
             </div>
 
             {/* Stats */}
@@ -70,13 +73,17 @@ export default function SystemAlerts() {
                     </CardContent>
                 </Card>
 
+                {/* Updated Stats for Budget Monitoring */}
                 <Card className="border-border/50">
                     <CardHeader className="pb-3">
-                        <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Security Warnings</CardTitle>
+                        <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Budget Crossings</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-extrabold tracking-tight text-warning">
-                            {mockAlerts.filter(a => a.type === 'warning').length}
+                        <div className="flex items-center gap-2">
+                            <Wallet className="h-6 w-6 text-orange-500" />
+                            <div className="text-3xl font-extrabold tracking-tight text-orange-500">
+                                {mockAlerts.filter(a => a.type === 'budget_crossing').length}
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -96,7 +103,7 @@ export default function SystemAlerts() {
             {/* System Alerts Table */}
             <Card className="border-border/50 shadow-xl overflow-hidden">
                 <CardHeader className="bg-muted/30">
-                    <CardTitle className="text-lg">Security Events Log</CardTitle>
+                    <CardTitle className="text-lg">Security & Budget Events Log</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
@@ -113,7 +120,7 @@ export default function SystemAlerts() {
                         </TableHeader>
                         <TableBody>
                             {mockAlerts.map((alert) => (
-                                <TableRow key={alert.id} className="hover:bg-muted/20">
+                                <TableRow key={alert.id} className={cn("hover:bg-muted/20", alert.type === 'budget_crossing' && "bg-orange-50/30")}>
                                     <TableCell className="font-mono text-xs">{alert.id}</TableCell>
                                     <TableCell className="font-mono text-xs">{alert.user_id}</TableCell>
                                     <TableCell>
