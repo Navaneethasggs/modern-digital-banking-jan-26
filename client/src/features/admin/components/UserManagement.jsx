@@ -7,7 +7,8 @@ import { Input } from '../../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 import api from '../../../api/axios';
 import { formatDate } from '../../../lib/utils';
-import { Search, UserX, Eye, UserCheck, Loader2 } from 'lucide-react';
+// Added Gift icon for rewards management
+import { Search, UserX, Eye, UserCheck, Loader2, Gift } from 'lucide-react';
 
 export default function UserManagement() {
     const [users, setUsers] = useState([]);
@@ -41,6 +42,22 @@ export default function UserManagement() {
         }
     };
 
+    // New handler for assigning bonus points
+    const handleAssignBonus = async (userId) => {
+        const amount = prompt("Enter bonus points to assign:");
+        if (!amount || isNaN(amount)) return;
+
+        try {
+            await api.post(`/analytics/admin/users/${userId}/rewards/bonus`, { points: parseInt(amount) });
+            // Refresh users to show updated points/tier
+            fetchUsers();
+            alert(`Successfully assigned ${amount} points!`);
+        } catch (error) {
+            console.error("Failed to assign bonus points", error);
+            alert("Error assigning points.");
+        }
+    };
+
     const filteredUsers = users.filter(user => {
         const matchesSearch = user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -59,6 +76,16 @@ export default function UserManagement() {
             default:
                 return <Badge variant="outline">{status}</Badge>;
         }
+    };
+
+    // Helper to render Reward Tier badges
+    const getRewardBadge = (tier) => {
+        const colors = {
+            gold: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
+            silver: "bg-slate-400/10 text-slate-600 border-slate-400/20",
+            bronze: "bg-orange-400/10 text-orange-600 border-orange-400/20"
+        };
+        return <Badge variant="outline" className={colors[tier?.toLowerCase()] || ""}>{tier || 'Standard'}</Badge>;
     };
 
     return (
@@ -154,6 +181,7 @@ export default function UserManagement() {
                                 <TableHead>Name</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>KYC Status</TableHead>
+                                <TableHead>Rewards</TableHead>
                                 <TableHead>Member Since</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -161,7 +189,7 @@ export default function UserManagement() {
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-32 text-center">
+                                    <TableCell colSpan={7} className="h-32 text-center">
                                         <div className="flex items-center justify-center gap-2 text-muted-foreground">
                                             <Loader2 className="h-5 w-5 animate-spin" />
                                             Syncing with directory...
@@ -174,9 +202,26 @@ export default function UserManagement() {
                                     <TableCell className="font-bold">{user.name}</TableCell>
                                     <TableCell className="text-muted-foreground">{user.email}</TableCell>
                                     <TableCell>{getKycBadge(user.kyc_status)}</TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-xs font-medium">{user.reward_points || 0} pts</span>
+                                            {getRewardBadge(user.reward_tier)}
+                                        </div>
+                                    </TableCell>
                                     <TableCell className="text-muted-foreground text-sm">{formatDate(user.created_at)}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
+                                            <Button 
+                                                variant="outline" 
+                                                size="sm" 
+                                                className="h-8 text-primary hover:bg-primary/10 border-primary/20"
+                                                onClick={() => handleAssignBonus(user.id)}
+                                                title="Assign Bonus Points"
+                                            >
+                                                <Gift className="h-3.5 w-3.5 mr-1.5" />
+                                                Bonus
+                                            </Button>
+
                                             {user.kyc_status === 'unverified' && (
                                                 <>
                                                     <Button
@@ -209,7 +254,7 @@ export default function UserManagement() {
                             ))}
                             {!loading && filteredUsers.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                                    <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
                                         No users found matching your criteria
                                     </TableCell>
                                 </TableRow>
