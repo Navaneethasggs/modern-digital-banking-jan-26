@@ -12,7 +12,8 @@ import {
     ArrowDownRight,
     Server,
     Database,
-    Cpu
+    Cpu,
+    Wallet // Added for Currency icons
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -89,6 +90,42 @@ export default function AdminDashboard() {
                             <ArrowDownRight className="h-3 w-3" />
                             <span>-15ms improvement</span>
                         </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* NEW: Currency & Exchange Rate Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="border-border/50 shadow-lg bg-card/50">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2 font-bold text-xs text-muted-foreground uppercase tracking-widest">
+                        Total Vault (INR)
+                        <Wallet className="h-4 w-4 text-indigo-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-indigo-600">₹8,42,000.00</div>
+                        <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Base Currency</p>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-border/50 shadow-lg bg-card/50">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2 font-bold text-xs text-muted-foreground uppercase tracking-widest">
+                        Total Vault (USD)
+                        <Wallet className="h-4 w-4 text-emerald-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-emerald-600">$10,120.45</div>
+                        <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Rate: 1 USD = 83.2 INR</p>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-border/50 shadow-lg bg-card/50">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2 font-bold text-xs text-muted-foreground uppercase tracking-widest">
+                        Total Vault (EUR)
+                        <Wallet className="h-4 w-4 text-blue-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-blue-600">€9,310.12</div>
+                        <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Rate: 1 EUR = 90.4 INR</p>
                     </CardContent>
                 </Card>
             </div>
