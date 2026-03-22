@@ -40,14 +40,16 @@ export const AuthProvider = ({ children }) => {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             });
+            
             const { access_token } = response.data;
-            localStorage.setItem('token', access_token);
+            localStorage.setItem("token", access_token);
 
             // Fetch user details immediately after login
             const userResponse = await api.get('/auth/me');
             setUser(userResponse.data);
             setIsAuthenticated(true);
-            return true;
+            
+            return access_token;
         } catch (error) {
             console.error("Login failed", error);
             throw error;

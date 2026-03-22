@@ -11,7 +11,7 @@ from src.accounts.models import Account
 
 router = APIRouter()
 
-@router.post("/", response_model=TransactionResponse)
+@router.post("", response_model=TransactionResponse)
 async def create_transaction(
     txn: TransactionCreate,
     current_user: User = Depends(get_current_user),
@@ -25,7 +25,7 @@ async def create_transaction(
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    new_txn = Transaction(**txn.dict())
+    new_txn = Transaction(**txn.model_dump())
     
     # Update account balance
     if txn.txn_type == TransactionType.credit:
@@ -56,7 +56,7 @@ async def update_transaction(
         raise HTTPException(status_code=404, detail="Transaction not found")
         
     # If amount or type is changing, we need to adjust the account balance
-    update_data = txn_update.dict(exclude_unset=True)
+    update_data = txn_update.model_dump(exclude_unset=True)
     if 'amount' in update_data or 'txn_type' in update_data:
         # Get the account
         account_result = await db.execute(select(Account).filter(Account.id == txn.account_id))
@@ -120,7 +120,7 @@ async def delete_transaction(
     await db.commit()
     return None
 
-@router.get("/", response_model=List[TransactionResponse])
+@router.get("", response_model=List[TransactionResponse])
 async def get_transactions(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
