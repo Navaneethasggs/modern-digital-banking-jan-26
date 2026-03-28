@@ -4,14 +4,19 @@ from sqlalchemy.future import select
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from src.database import get_db
 from src.auth.models import User, KYCStatus
-from src.auth.schemas import UserCreate, UserResponse, Token
+from src.auth.schemas import UserCreate, UserResponse, Token, VerifyOTPRequest
 from src.auth.service import get_password_hash, verify_password, create_access_token
 from src.config import settings
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
+import random
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
+# In-memory store for OTPs
+# Structure: email -> {"otp": "123456", "user_data": UserCreate, "expires_at": datetime}
+otp_store = {}
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
     credentials_exception = HTTPException(
@@ -33,12 +38,52 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         raise credentials_exception
     return user
 
-@router.post("/register", response_model=UserResponse)
+@router.post("/register")
 async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).filter(User.email == user.email))
     if result.scalars().first():
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    otp = f"{random.randint(100000, 999999)}"
+    
+    otp_store[user.email] = {
+        "otp": otp,
+        "user_data": user,
+        "expires_at": datetime.now(timezone.utc) + timedelta(minutes=5)
+    }
+    
+    # Mock Email sending
+    print("\n" + "="*40)
+    print(f"MOCK EMAIL TO: {user.email}")
+    print(f"SUBJECT: Your NeoVault Account Verification OTP")
+    print(f"OTP CODE: {otp}")
+    print("="*40 + "\n")
+    
+    return {"message": "OTP sent to email. Please verify to activate account.", "email": user.email}
+
+@router.post("/verify-otp", response_model=UserResponse)
+async def verify_otp(data: VerifyOTPRequest, db: AsyncSession = Depends(get_db)):
+    record = otp_store.get(data.email)
+    
+    if not record:
+        raise HTTPException(status_code=400, detail="OTP not found or already verified")
+        
+    if record["expires_at"] < datetime.now(timezone.utc):
+        del otp_store[data.email]
+        raise HTTPException(status_code=400, detail="OTP expired. Please register again.")
+        
+    if record["otp"] != data.otp:
+        raise HTTPException(status_code=400, detail="Invalid OTP")
+        
+    # Valid OTP, create user
+    user = record["user_data"]
+    
+    # Check again if user exists to prevent race conditions
+    result = await db.execute(select(User).filter(User.email == user.email))
+    if result.scalars().first():
+        del otp_store[data.email]
+        raise HTTPException(status_code=400, detail="Email already registered")
+
     new_user = User(
         name=user.name,
         email=user.email,
@@ -49,6 +94,10 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
+    
+    # Clean up OTP
+    del otp_store[data.email]
+    
     return new_user
 
 @router.post("/login", response_model=Token)
