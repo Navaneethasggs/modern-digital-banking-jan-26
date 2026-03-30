@@ -11,6 +11,10 @@ class UserCreate(UserBase):
     password: str
     phone: Optional[str] = None
 
+class VerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str

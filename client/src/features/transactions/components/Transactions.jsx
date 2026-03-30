@@ -34,7 +34,7 @@ export default function Transactions() {
       if (editingId) {
         await api.put(`/transactions/${editingId}`, formData);
       } else {
-        await api.post('/transactions/', formData);
+        await api.post('/transactions', formData);
       }
       setShowModal(false);
       setEditingId(null);
