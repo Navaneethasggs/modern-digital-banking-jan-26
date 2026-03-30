@@ -1,6 +1,15 @@
 # Root .gitignore for NeoVault
 
 # Node.js
+# .env files
+.env
+.env.*
+*.env
+
+# App-specific ignoring
+models.txt
+test_gemini.py
+
 node_modules/
 dist/
 build/
