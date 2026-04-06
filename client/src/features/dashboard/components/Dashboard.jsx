@@ -27,8 +27,7 @@ export default function Dashboard() {
     setIsGeneratingAi(true);
     setAiError(null);
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const response = await fetch(`${BASE_URL}/ai-insights/summary`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/ai-insights/summary`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}` // simple assumption based on standard JWT integration
         }
