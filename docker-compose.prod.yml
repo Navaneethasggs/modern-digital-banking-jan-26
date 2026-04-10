@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - neovault_network
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@db:5432/neovault
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=change-this-in-production
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    depends_on:
+      - db
+      - redis
+    networks:
+      - neovault_network
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: neovault
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - neovault_network
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    networks:
+      - neovault_network
+
+volumes:
+  postgres_data:
+
+networks:
+  neovault_network:
