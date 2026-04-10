@@ -45,11 +45,12 @@ jobs:
             # Export secrets as environment variables before building/running
             export GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
             
+            # Build and restart containers using Docker Compose
+            docker compose -f docker-compose.prod.yml down
+            
             # Cleanup unused docker images to save space BEFORE building to prevent "No space left on device"
             docker system prune -af
             docker builder prune -af
             
-            # Build and restart containers using Docker Compose
-            docker compose -f docker-compose.prod.yml down
             docker compose -f docker-compose.prod.yml build
             docker compose -f docker-compose.prod.yml up -d
