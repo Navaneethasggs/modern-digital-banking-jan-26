@@ -19,9 +19,11 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e # Stop script on any error
+            
             # Navigate to the target directory (or clone if it doesn't exist)
             if [ ! -d "modern-digital-banking-jan-26" ]; then
-              git clone https://github.com/your-username/modern-digital-banking-jan-26.git
+              git clone https://github.com/${{ github.repository }}.git modern-digital-banking-jan-26
             fi
             
             cd modern-digital-banking-jan-26
