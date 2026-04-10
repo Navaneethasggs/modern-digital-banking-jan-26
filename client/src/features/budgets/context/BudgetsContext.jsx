@@ -14,7 +14,7 @@ export const BudgetsProvider = ({ children }) => {
         setLoading(true);
         try {
             const today = new Date();
-            const res = await api.get('/budgets/', {
+            const res = await api.get('/budgets', {
                 params: { month: today.getMonth() + 1, year: today.getFullYear() }
             });
             setBudgets(res.data);

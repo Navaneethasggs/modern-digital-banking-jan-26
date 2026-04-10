@@ -13,7 +13,7 @@ export const TransactionsProvider = ({ children }) => {
         if (!isAuthenticated) return;
         setLoading(true);
         try {
-            const res = await api.get('/transactions/');
+            const res = await api.get('/transactions');
             setTransactions(res.data);
         } catch (error) {
             console.error("Error fetching transactions", error);

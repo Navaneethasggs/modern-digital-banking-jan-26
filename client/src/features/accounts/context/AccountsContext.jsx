@@ -13,7 +13,7 @@ export const AccountsProvider = ({ children }) => {
         if (!isAuthenticated) return;
         setLoading(true);
         try {
-            const res = await api.get('/accounts/');
+            const res = await api.get('/accounts');
             setAccounts(res.data);
         } catch (error) {
             console.error("Error fetching accounts", error);
