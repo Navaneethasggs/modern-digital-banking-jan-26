@@ -50,8 +50,5 @@ jobs:
             docker compose -f docker-compose.prod.yml build
             docker compose -f docker-compose.prod.yml up -d
             
-            # Run database migrations
-            docker compose -f docker-compose.prod.yml exec -T server alembic upgrade head
-            
             # Cleanup unused docker images to save space
             docker system prune -af
