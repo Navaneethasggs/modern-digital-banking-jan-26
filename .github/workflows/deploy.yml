@@ -45,12 +45,23 @@ jobs:
             # Export secrets as environment variables before building/running
             export GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
             
-            # Build and restart containers using Docker Compose
-            docker compose -f docker-compose.prod.yml down
+            # Print disk space before cleanup
+            df -h
             
-            # Cleanup unused docker images to save space BEFORE building to prevent "No space left on device"
-            docker system prune -af
+            # Aggressive System Cleanup
+            sudo journalctl --vacuum-size=50M || true
+            sudo apt-get clean || true
+            sudo rm -rf /var/lib/apt/lists/* || true
+            
+            # Build and restart containers using Docker Compose
+            docker compose -f docker-compose.prod.yml down || true
+            
+            # Cleanup unused docker images and volumes to save space BEFORE building
+            docker system prune -a --volumes -f
             docker builder prune -af
+            
+            # Print disk space after cleanup
+            df -h
             
             docker compose -f docker-compose.prod.yml build
             docker compose -f docker-compose.prod.yml up -d
