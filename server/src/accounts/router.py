@@ -10,7 +10,7 @@ from src.accounts.schemas import AccountCreate, AccountResponse
 
 router = APIRouter()
 
-@router.post("/", response_model=AccountResponse)
+@router.post("", response_model=AccountResponse)
 async def create_account(
     account: AccountCreate,
     current_user: User = Depends(get_current_user),
@@ -22,7 +22,7 @@ async def create_account(
     await db.refresh(new_account)
     return new_account
 
-@router.get("/", response_model=List[AccountResponse])
+@router.get("", response_model=List[AccountResponse])
 async def get_accounts(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
