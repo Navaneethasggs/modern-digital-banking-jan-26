@@ -20,6 +20,8 @@ class BudgetUpdate(BaseModel):
 class BudgetResponse(BudgetBase):
     id: int
     spent_amount: float
+    is_ai_generated: bool = False
+    confidence_score: Optional[float] = None
     created_at: datetime
     
     class Config:
