@@ -26,7 +26,7 @@ export default function Budgets() {
       if (editingId) {
         await api.put(`/budgets/${editingId}`, formData);
       } else {
-        await api.post('/budgets/', formData);
+        await api.post('/budgets', formData);
       }
       setShowModal(false);
       setEditingId(null);

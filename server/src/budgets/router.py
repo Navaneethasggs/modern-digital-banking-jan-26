@@ -13,7 +13,7 @@ from src.accounts.models import Account
 
 router = APIRouter()
 
-@router.post("/", response_model=BudgetResponse)
+@router.post("", response_model=BudgetResponse)
 async def create_budget(
     budget: BudgetCreate,
     current_user: User = Depends(get_current_user),
@@ -89,7 +89,7 @@ async def update_budget(
     await db.refresh(budget)
     return budget
 
-@router.get("/", response_model=List[BudgetResponse])
+@router.get("", response_model=List[BudgetResponse])
 async def get_budgets(
     month: int,
     year: int,

@@ -13,7 +13,7 @@ export const BillsProvider = ({ children }) => {
         if (!isAuthenticated) return;
         setLoading(true);
         try {
-            const res = await api.get('/bills/');
+            const res = await api.get('/bills');
             setBills(res.data);
         } catch (error) {
             console.error("Error fetching bills", error);
