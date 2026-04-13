@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useBudgets } from '../context/BudgetsContext';
+import AIBudgetRecommendations from './AIBudgetRecommendations';
 import api from '../../../api/axios';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Progress } from '../../../components/ui/progress';
 import { Badge } from '../../../components/ui/badge';
 import { formatCurrency, cn } from '../../../lib/utils';
-import { Plus, Target, AlertCircle, CheckCircle2, MoreVertical, TrendingUp, Edit } from 'lucide-react';
+import { Plus, Target, AlertCircle, CheckCircle2, MoreVertical, TrendingUp, Edit, Trash2 } from 'lucide-react';
 
 export default function Budgets() {
   const { budgets, refreshBudgets } = useBudgets();
@@ -46,6 +47,18 @@ export default function Budgets() {
     });
     setEditingId(budget.id);
     setShowModal(true);
+    setDropdownOpen(null);
+  };
+
+  const handleDeleteClick = async (id) => {
+    if (window.confirm("Are you sure you want to delete this budget?")) {
+      try {
+        await api.delete(`/budgets/${id}`);
+        refreshBudgets();
+      } catch (error) {
+        console.error("Failed to delete budget", error);
+      }
+    }
     setDropdownOpen(null);
   };
 
@@ -108,6 +121,12 @@ export default function Budgets() {
                         >
                           <Edit className="h-3.5 w-3.5" /> Edit
                         </button>
+                        <button
+                          onClick={() => handleDeleteClick(budget.id)}
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-destructive/10 text-destructive flex items-center gap-2"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                        </button>
                       </div>
                     )}
                   </div>
@@ -164,6 +183,9 @@ export default function Budgets() {
           );
         })}
       </div>
+
+      {/* AI Budget Recommendations Section */}
+      <AIBudgetRecommendations refreshBudgets={refreshBudgets} />
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
