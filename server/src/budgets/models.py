@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Numeric, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Numeric, DateTime, ForeignKey, Boolean, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database import Base
@@ -13,6 +13,8 @@ class Budget(Base):
     category = Column(String, nullable=False)
     limit_amount = Column(Numeric(10, 2), nullable=False)
     spent_amount = Column(Numeric(10, 2), default=0.0)
+    is_ai_generated = Column(Boolean, default=False)
+    confidence_score = Column(Float, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("src.auth.models.User")

@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { useTransactions } from '../features/transactions';
 import { useAccounts } from '../features/accounts';
-import { Bell, Search, User, ChevronDown, X, ArrowUpRight, ArrowDownRight, Wallet } from 'lucide-react';
+import { Bell, Search, User, ChevronDown, X, ArrowUpRight, ArrowDownRight, Wallet, Menu } from 'lucide-react';
 import { cn, formatCurrency } from '../lib/utils';
 import { useNavigate, Link } from 'react-router-dom';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -17,6 +17,7 @@ export default function PageContainer({ children }) {
   const [searchResults, setSearchResults] = useState({ transactions: [], accounts: [] });
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (searchQuery.trim().length > 1) {
@@ -50,13 +51,20 @@ export default function PageContainer({ children }) {
   }, [searchRef]);
 
   return (
-    <div className="flex h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
-      <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex h-screen w-full bg-background text-foreground selection:bg-primary/20 selection:text-primary overflow-hidden relative">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col min-w-0">
         <header className="bg-card/80 backdrop-blur-xl border-b border-border h-16 flex items-center shrink-0 sticky top-0 z-20">
-          <div className="flex-1 px-8 flex justify-between items-center">
-            {/* Mobile Brand */}
-            <div className="flex items-center md:hidden gap-3">
+          <div className="flex-1 px-4 md:px-8 flex justify-between items-center">
+            {/* Mobile Menu & Brand */}
+            <div className="flex items-center md:hidden gap-2">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 -ml-2 text-muted-foreground hover:bg-muted/50 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20"
+                aria-label="Toggle Menu"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold">N</span>
               </div>
@@ -207,7 +215,7 @@ export default function PageContainer({ children }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-8">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-4 md:p-8">
           <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
             {children}
           </div>

@@ -13,7 +13,7 @@ from src.accounts.models import Account
 
 router = APIRouter()
 
-@router.post("/", response_model=BudgetResponse)
+@router.post("", response_model=BudgetResponse)
 async def create_budget(
     budget: BudgetCreate,
     current_user: User = Depends(get_current_user),
@@ -89,7 +89,7 @@ async def update_budget(
     await db.refresh(budget)
     return budget
 
-@router.get("/", response_model=List[BudgetResponse])
+@router.get("", response_model=List[BudgetResponse])
 async def get_budgets(
     month: int,
     year: int,
@@ -125,3 +125,20 @@ async def get_budgets(
         updated_budgets.append(budget)
 
     return updated_budgets
+
+@router.delete("/{budget_id}")
+async def delete_budget(
+    budget_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(
+        select(Budget).filter(Budget.id == budget_id, Budget.user_id == current_user.id)
+    )
+    budget = result.scalars().first()
+    if not budget:
+        raise HTTPException(status_code=404, detail="Budget not found")
+        
+    await db.delete(budget)
+    await db.commit()
+    return {"message": "Budget deleted successfully"}

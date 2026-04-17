@@ -10,7 +10,7 @@ from src.bills.schemas import BillCreate, BillResponse, RewardResponse
 
 router = APIRouter()
 
-@router.post("/", response_model=BillResponse)
+@router.post("", response_model=BillResponse)
 async def create_bill(
     bill: BillCreate,
     current_user: User = Depends(get_current_user),
@@ -22,7 +22,7 @@ async def create_bill(
     await db.refresh(new_bill)
     return new_bill
 
-@router.get("/", response_model=List[BillResponse])
+@router.get("", response_model=List[BillResponse])
 async def get_bills(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)

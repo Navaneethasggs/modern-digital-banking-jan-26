@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: `http://${window.location.hostname}:8000`,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -26,10 +26,13 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      // Here you would typically handle token refresh logic
-      // For now, we'll just logout user if token is invalid
+      // If the 401 is from a login attempt, just reject it so the component can show the error
+      if (originalRequest.url === '/auth/login') {
+        return Promise.reject(error);
+      }
+      // For other requests, logout user if token is invalid
       localStorage.removeItem('token');
       window.location.href = '/';
     }
