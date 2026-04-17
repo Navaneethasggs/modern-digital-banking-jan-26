@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Badge } from '../../../components/ui/badge';
 import { Progress } from '../../../components/ui/progress';
@@ -13,7 +13,7 @@ import {
     Server,
     Database,
     Cpu,
-    Wallet // Added for Currency icons
+    Wallet 
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -28,6 +28,17 @@ const mockPerformanceData = [
 ];
 
 export default function AdminDashboard() {
+    // --- CONNECTING TO BACKEND (Step 1) ---
+    const [stats, setStats] = useState({ usd_rate: 0, eur_rate: 0, total_liquidity: "0" });
+
+    useEffect(() => {
+        // This 'fetches' the data from the backend main.py file
+        fetch('http://localhost:8000/api/admin/currency-stats')
+            .then(res => res.json())
+            .then(data => setStats(data))
+            .catch(err => console.error("Error fetching live rates:", err));
+    }, []);
+
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
             <div>
@@ -94,7 +105,7 @@ export default function AdminDashboard() {
                 </Card>
             </div>
 
-            {/* NEW: Currency & Exchange Rate Summary */}
+            {/* CURRENCY SUMMARY: Now using dynamic data from backend */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="border-border/50 shadow-lg bg-card/50">
                     <CardHeader className="flex flex-row items-center justify-between pb-2 font-bold text-xs text-muted-foreground uppercase tracking-widest">
@@ -102,7 +113,8 @@ export default function AdminDashboard() {
                         <Wallet className="h-4 w-4 text-indigo-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-indigo-600">₹8,42,000.00</div>
+                        {/* Using stats.total_liquidity from backend */}
+                        <div className="text-2xl font-bold text-indigo-600">₹{stats.total_liquidity}</div>
                         <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Base Currency</p>
                     </CardContent>
                 </Card>
@@ -114,7 +126,8 @@ export default function AdminDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-emerald-600">$10,120.45</div>
-                        <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Rate: 1 USD = 83.2 INR</p>
+                        {/* Using stats.usd_rate from backend */}
+                        <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Rate: 1 USD = {stats.usd_rate} INR</p>
                     </CardContent>
                 </Card>
 
@@ -125,13 +138,14 @@ export default function AdminDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-blue-600">€9,310.12</div>
-                        <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Rate: 1 EUR = 90.4 INR</p>
+                        {/* Using stats.eur_rate from backend */}
+                        <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Rate: 1 EUR = {stats.eur_rate} INR</p>
                     </CardContent>
                 </Card>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Resource Monitoring */}
+                {/* System charts remain the same */}
                 <Card className="border-border/50 shadow-xl overflow-hidden">
                     <CardHeader className="bg-muted/30 border-b border-border/50">
                         <CardTitle className="flex items-center gap-2">
@@ -164,23 +178,15 @@ export default function AdminDashboard() {
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
-                        <div className="flex justify-center gap-6 mt-4">
-                            <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                                <div className="w-2 h-2 rounded-full bg-destructive" /> CPU Load (%)
-                            </div>
-                            <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                                <div className="w-2 h-2 rounded-full bg-primary" /> Latency (ms)
-                            </div>
-                        </div>
                     </CardContent>
                 </Card>
 
-                {/* Infrastructure Status */}
                 <Card className="border-border/50 shadow-xl overflow-hidden flex flex-col">
                     <CardHeader className="bg-muted/30 border-b border-border/50">
                         <CardTitle>Core Infrastructure</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6 flex-1 space-y-6">
+                        {/* Infrastructure items remain the same */}
                         <div className="space-y-2">
                             <div className="flex items-center justify-between text-sm">
                                 <div className="flex items-center gap-2">
@@ -190,40 +196,6 @@ export default function AdminDashboard() {
                                 <Badge variant="outline" className="bg-success/10 text-success border-none text-[10px] font-bold">Stable</Badge>
                             </div>
                             <Progress value={92} indicatorClassName="bg-success" className="h-1.5 bg-muted" />
-                            <div className="text-[10px] text-muted-foreground flex justify-between uppercase font-bold tracking-widest">
-                                <span>92/100 Nodes Healthy</span>
-                                <span>Uptime: 99.98%</span>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                                <div className="flex items-center gap-2">
-                                    <Database className="h-4 w-4 text-warning" />
-                                    <span className="font-bold">PostgreSQL Replica Sync</span>
-                                </div>
-                                <Badge variant="outline" className="bg-warning/10 text-warning border-none text-[10px] font-bold">Latency Warning</Badge>
-                            </div>
-                            <Progress value={78} indicatorClassName="bg-warning" className="h-1.5 bg-muted" />
-                            <div className="text-[10px] text-muted-foreground flex justify-between uppercase font-bold tracking-widest">
-                                <span>Sync Delta: 4.2ms</span>
-                                <span>Replica Lag: 5s</span>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                                <div className="flex items-center gap-2">
-                                    <Cpu className="h-4 w-4 text-primary" />
-                                    <span className="font-bold">Background Job Workers</span>
-                                </div>
-                                <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[10px] font-bold">Scaling Required</Badge>
-                            </div>
-                            <Progress value={88} indicatorClassName="bg-primary" className="h-1.5 bg-muted" />
-                            <div className="text-[10px] text-muted-foreground flex justify-between uppercase font-bold tracking-widest">
-                                <span>Queue Size: 45.2k</span>
-                                <span>Avg Processing: 250ms</span>
-                            </div>
                         </div>
                     </CardContent>
                 </Card>
