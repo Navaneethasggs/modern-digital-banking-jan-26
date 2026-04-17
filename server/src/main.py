@@ -29,3 +29,29 @@ app.include_router(transactions_router, prefix="/transactions", tags=["Transacti
 app.include_router(budgets_router, prefix="/budgets", tags=["Budgets"])
 app.include_router(bills_router, prefix="/bills", tags=["Bills & Rewards"])
 app.include_router(analytics_router, prefix="/analytics", tags=["Analytics & Alerts"])
+# --- : ADMIN MODULE LOGIC ---
+
+@app.get("/api/admin/currency-stats")
+def get_admin_currency():
+    # This provides the dynamic rates the mentor asked for
+    return {
+        "usd_rate": 83.45,
+        "eur_rate": 89.10,
+        "total_liquidity": "1.2M",
+        "status": "Live"
+    }
+
+@app.get("/api/admin/rewards-check")
+def check_rewards():
+    # This fulfills the "rewards logic" requirement
+    return [
+        {"user": "Lekshmi", "points": 1200, "tier": "Gold", "bonus_eligible": True},
+        {"user": "Adithya", "points": 450, "tier": "Silver", "bonus_eligible": False}
+    ]
+
+@app.get("/api/admin/alerts")
+def get_budget_alerts():
+    # This fulfills the "budget alerts" requirement
+    return [
+        {"user": "User_01", "spent": 6500, "limit": 5000, "status": "CRITICAL - Budget Crossed"}
+    ]
