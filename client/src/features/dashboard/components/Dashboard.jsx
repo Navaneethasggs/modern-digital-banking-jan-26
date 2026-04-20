@@ -9,7 +9,7 @@ import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
 import { Progress } from '../../../components/ui/progress';
 import { formatCurrency, formatDate, cn } from '../../../lib/utils';
-import { ArrowUpRight, ArrowDownRight, TrendingUp, Calendar, Gift, Wallet, CreditCard, Landmark, Banknote, Sparkles, Target } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, TrendingUp, Calendar, Gift, Wallet, CreditCard, Landmark, Banknote, Sparkles, Target, Bot, Loader2 } from 'lucide-react';
 import { AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 export default function Dashboard() {
@@ -25,6 +25,31 @@ export default function Dashboard() {
     const timer = setTimeout(() => setAnimatingBudgets(false), 800);
     return () => clearTimeout(timer);
   }, []);
+
+  const [aiSummary, setAiSummary] = useState(null);
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const [aiError, setAiError] = useState(null);
+
+  const generateAiSummary = async () => {
+    setIsGeneratingAi(true);
+    setAiError(null);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/ai-insights/summary`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // simple assumption based on standard JWT integration
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to generate summary');
+      }
+      const data = await response.json();
+      setAiSummary(data.summary);
+    } catch (err) {
+      setAiError('Oops! We encountered an error generating your summary. Please ensure your API key is correctly configured.');
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
 
   const totalBalance = accounts?.reduce((sum, acc) => sum + acc.balance, 0) || 0;
   const recentTransactions = transactions?.slice(0, 5) || [];
@@ -111,6 +136,68 @@ export default function Dashboard() {
           <span className="text-sm font-bold">{new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}</span>
         </div>
       </div>
+
+      {/* AI Assistant Card */}
+      <Card className="relative overflow-hidden group border-primary/20 shadow-xl bg-gradient-to-br from-card to-primary/5">
+        <CardHeader className="pb-3 border-b border-border/50">
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-primary/10 rounded-full">
+                <Bot className="h-5 w-5 text-primary" />
+              </div>
+              <span className="font-extrabold text-xl">Neo AI Financial Assistant</span>
+            </div>
+            {!aiSummary && !isGeneratingAi && (
+              <Button onClick={generateAiSummary} className="rounded-full shadow-lg hover:shadow-primary/25 transition-all">
+                <Sparkles className="h-4 w-4 mr-2" />
+                Generate Weekly Summary
+              </Button>
+            )}
+          </CardTitle>
+          <CardDescription className="text-sm font-medium ml-11">
+            Get personalized, contextual insights on your recent spending habits powered by AI.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          {isGeneratingAi && (
+            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground space-y-4 animate-pulse">
+               <Loader2 className="h-8 w-8 animate-spin text-primary" />
+               <p className="font-medium">Analyzing your recent transactions and preparing insights...</p>
+            </div>
+          )}
+          {aiError && (
+             <div className="p-4 bg-destructive/10 text-destructive rounded-xl text-sm font-medium flex items-center gap-2">
+                <Bot className="h-5 w-5" />
+                {aiError}
+             </div>
+          )}
+          {aiSummary && !isGeneratingAi && (
+            <div className="space-y-4 ml-2">
+              <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-li:font-medium prose-p:text-base">
+                {/* We are rendering plain text with simple newlines for now. Using a markdown parser would be better, but we'll simulate basic parsing */}
+                {aiSummary.split('\n').map((paragraph, i) => {
+                  if (paragraph.trim().startsWith('- ') || paragraph.trim().startsWith('* ')) {
+                     return <li key={i} className="ml-4 mb-2">{paragraph.replace(/^[-*]\s/, '')}</li>;
+                  } else if (paragraph.trim() !== '') {
+                     return <p key={i} className="mb-4 text-foreground/90">{paragraph}</p>;
+                  }
+                  return null;
+                })}
+              </div>
+              <div className="flex justify-end mt-4">
+                 <Button variant="outline" size="sm" onClick={generateAiSummary} className="rounded-full text-xs font-bold border-primary/20 hover:bg-primary/10">
+                   <Sparkles className="h-3 w-3 mr-1.5" /> Regenerate
+                 </Button>
+              </div>
+            </div>
+          )}
+          {!aiSummary && !isGeneratingAi && !aiError && (
+            <div className="py-6 text-center text-muted-foreground">
+               <p className="text-sm">Click the button above to generate your first AI summary.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

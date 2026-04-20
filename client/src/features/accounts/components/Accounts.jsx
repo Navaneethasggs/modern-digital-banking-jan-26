@@ -21,10 +21,10 @@ export default function Accounts() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/accounts/', formData);
+      await api.post('/accounts', formData);
       setShowModal(false);
       setFormData({ bank_name: '', account_type: 'checking', masked_account: '', currency: 'INR', balance: '' });
-      refreshData();
+      refreshAccounts();
     } catch (error) {
       console.error("Failed to create account", error);
     }

@@ -7,6 +7,7 @@ class AlertType(str, enum.Enum):
     low_balance = "low_balance"
     bill_due = "bill_due"
     budget_exceeded = "budget_exceeded"
+    budget_prediction = "budget_prediction"
 
 class Alert(Base):
     __tablename__ = "alerts"

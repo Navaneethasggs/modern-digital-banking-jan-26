@@ -1,0 +1,67 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main-group-D-new
+      - Group-D-feature/AWS-deployement-ameen # Trigger on push to this branch for testing
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 30m
+          script: |
+            set -e # Stop script on any error
+            
+            # Setup Swap space to prevent Out Of Memory errors during Docker React Build on 1GB instances
+            if [ ! -f /swapfile ]; then
+              sudo fallocate -l 2G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
+            fi
+            
+            # Navigate to the target directory (or clone if it doesn't exist)
+            if [ ! -d "modern-digital-banking-jan-26" ]; then
+              git clone https://github.com/${{ github.repository }}.git modern-digital-banking-jan-26
+            fi
+            
+            cd modern-digital-banking-jan-26
+            
+            # Fetch and pull the latest changes
+            git fetch origin
+            git checkout Group-D-feature/AWS-deployement-ameen
+            git pull origin Group-D-feature/AWS-deployement-ameen
+            
+            # Export secrets as environment variables before building/running
+            export GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
+            
+            # Print disk space before cleanup
+            df -h
+            
+            # Aggressive System Cleanup
+            sudo journalctl --vacuum-size=50M || true
+            sudo apt-get clean || true
+            sudo rm -rf /var/lib/apt/lists/* || true
+            
+            # Build and restart containers using Docker Compose
+            docker compose -f docker-compose.prod.yml down || true
+            
+            # Cleanup unused docker images and volumes to save space BEFORE building
+            docker system prune -a --volumes -f
+            docker builder prune -af
+            
+            # Print disk space after cleanup
+            df -h
+            
+            docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml up -d

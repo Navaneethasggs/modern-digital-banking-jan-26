@@ -21,7 +21,7 @@ export default function Bills() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/bills/', formData);
+      await api.post('/bills', formData);
       setShowModal(false);
       setFormData({ biller_name: '', due_date: '', amount_due: '', status: 'upcoming', auto_pay: false });
       refreshData();
